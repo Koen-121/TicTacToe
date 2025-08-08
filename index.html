@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tic-Tac-Toe</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<span class="bg-symbol x1">X</span>
+<span class="bg-symbol o1">O</span>
+<span class="bg-symbol x2">X</span>
+<span class="bg-symbol o2">O</span>
+<span class="bg-symbol x3">X</span>
+<span class="bg-symbol o3">O</span>
+<span class="bg-symbol x4">X</span>
+<span class="bg-symbol o4">O</span>
+<span class="bg-symbol x5">X</span>
+<span class="bg-symbol o5">O</span>
+<span class="bg-symbol x6">X</span>
+<span class="bg-symbol o6">O</span>
+<div class="main-layout">
+  <div class="container">
+    <h1>Tic-Tac-Toe</h1>
+    <button id="play-btn">Play vs AI</button>
+    <button id="friend-btn">Play vs Friend</button>
+    <div id="message" style="display:none; font-size:2em; color:#fff; margin-bottom:20px;"></div>
+    <div id="turn-display" style="display:none; font-size:1.5em; color:#fff; margin-bottom:20px;"></div>
+    <div class="grid" style="display:none;">
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+    </div>
+  </div>
+  <div class="rules-box">
+    <h2>Rules</h2>
+    <ul>
+      <li>1. Get 3 in a row to win.</li>
+      <li>2. You get one turn at a time.</li>
+      <li>3. X always goes first.</li>
+      <li>4. If all squares are filled and no one wins, it's a draw.</li>
+    </ul>
+  </div>
+</div>
+<script src="script.js"></script>
+</body>
+</html>
