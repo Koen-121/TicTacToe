@@ -30,12 +30,13 @@ playBtn.addEventListener('click', function() {
   friendBtn.style.display = 'none';
   grid.style.display = 'grid';
   friendMode = false;
+  
   if (Math.random() < 0.5) {
-  aiTurn = false;
-} else {
-  aiTurn = true;
-}
-  aiTurn = false;
+    aiTurn = false;
+  } else {
+    aiTurn = true;
+  }
+
   resetBoard();
   showGame();
   updateTurnDisplay();
