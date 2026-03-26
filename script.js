@@ -17,7 +17,7 @@ function updateTurnDisplay() {
     turnDisplay.textContent = `Turn: ${currentPlayer}`;
     turnDisplay.style.display = "block";
   } else {
-    turnDisplay.textContent = "You are X, AI is O";
+    turnDisplay.textContent = `Turn: ${currentPlayer}`;
     turnDisplay.style.display = "block";
   if (playBtn.style.display = "none") {
     turnDisplay.style.display = "none";
@@ -30,6 +30,11 @@ playBtn.addEventListener('click', function() {
   friendBtn.style.display = 'none';
   grid.style.display = 'grid';
   friendMode = false;
+  if (Math.random() < 0.5) {
+  aiTurn = false;
+} else {
+  aiTurn = true;
+}
   aiTurn = false;
   resetBoard();
   showGame();
