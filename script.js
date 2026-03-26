@@ -100,8 +100,7 @@ function minimax(board, depth, isMax) {
 }
 
 function findBestMove(board) {
-  // 50/50 optimal/random for AI mode
-  if (Math.random() < 0.5) {
+  if (Math.random() < 1.01) {
     let bestVal = -Infinity;
     let bestMove = -1;
     for (let i = 0; i < 9; i++) {
