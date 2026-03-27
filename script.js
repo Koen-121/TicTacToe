@@ -33,8 +33,10 @@ playBtn.addEventListener('click', function() {
   
   if (Math.random() < 0.5) {
     aiTurn = false;
+    currentPlayer = 'X';
   } else {
     aiTurn = true;
+    currentPlayer = 'O';
   }
 
   resetBoard();
