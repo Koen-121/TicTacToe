@@ -34,7 +34,7 @@ playBtn.addEventListener('click', function () {
     currentPlayer = 'X';
   } else {
     aiTurn = true;
-    currentPlayer = 'X';
+    currentPlayer = 'O';
   }
 
   resetBoard();
