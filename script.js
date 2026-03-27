@@ -46,12 +46,12 @@ playBtn.addEventListener('click', function () {
       let board = getBoard();
       let bestMove = findBestMove(board);
       if (bestMove !== -1) {
-        cells[bestMove].textContent = 'O';
+        cells[bestMove].textContent = 'X';
         cells[bestMove].classList.add('clicked');
         setTimeout(() => cells[bestMove].classList.remove('clicked'), 300);
       }
       aiTurn = false;
-      currentPlayer = 'X';
+      currentPlayer = 'O';
       updateTurnDisplay();
     }, 300);
   }
