@@ -7,59 +7,57 @@ const turnDisplay = document.getElementById('turn-display');
 
 let friendMode = false;
 let currentPlayer = 'X';
+let aiTurn = false; // IMPORTANT FIX
 
 function updateTurnDisplay() {
   if (!grid.style.display || grid.style.display === "none") {
     turnDisplay.style.display = "none";
     return;
   }
-  if (friendMode) {
-    turnDisplay.textContent = `Turn: ${currentPlayer}`;
-    turnDisplay.style.display = "block";
-  } else {
-    turnDisplay.textContent = `Turn: ${currentPlayer}`;
-    turnDisplay.style.display = "block";
+
+  turnDisplay.textContent = `Turn: ${currentPlayer}`;
+  turnDisplay.style.display = "block";
+
   if (playBtn.style.display === "none") {
     turnDisplay.style.display = "none";
   }
-  }
 }
 
-playBtn.addEventListener('click', function() {
+playBtn.addEventListener('click', function () {
   playBtn.style.display = 'none';
   friendBtn.style.display = 'none';
   grid.style.display = 'grid';
   friendMode = false;
-  
+
   if (Math.random() < 0.5) {
     aiTurn = false;
     currentPlayer = 'X';
   } else {
     aiTurn = true;
-    currentPlayer = 'O';
+    currentPlayer = 'X';
   }
 
   resetBoard();
-  showGame();
   updateTurnDisplay();
 
-if (aiTurn && !friendMode) {
+  // AI starts immediately
+  if (aiTurn && !friendMode) {
     setTimeout(() => {
-        let board = getBoard();
-        let bestMove = findBestMove(board);
-        if (bestMove !== -1) {
-            cells[bestMove].textContent = 'O';
-            cells[bestMove].classList.add('clicked');
-            setTimeout(() => cells[bestMove].classList.remove('clicked'), 300);
-        }
-        aiTurn = false;
-        updateTurnDisplay();
+      let board = getBoard();
+      let bestMove = findBestMove(board);
+      if (bestMove !== -1) {
+        cells[bestMove].textContent = 'O';
+        cells[bestMove].classList.add('clicked');
+        setTimeout(() => cells[bestMove].classList.remove('clicked'), 300);
+      }
+      aiTurn = false;
+      currentPlayer = 'X';
+      updateTurnDisplay();
     }, 300);
-}
-  
+  }
 });
 
-friendBtn.addEventListener('click', function() {
+friendBtn.addEventListener('click', function () {
   playBtn.style.display = 'none';
   friendBtn.style.display = 'none';
   grid.style.display = 'grid';
@@ -123,29 +121,21 @@ function minimax(board, depth, isMax) {
 }
 
 function findBestMove(board) {
-  if (Math.random() < 1.01) {
-    let bestVal = -Infinity;
-    let bestMove = -1;
-    for (let i = 0; i < 9; i++) {
-      if (board[i] === "") {
-        board[i] = "O";
-        let moveVal = minimax(board, 0, false);
-        board[i] = "";
-        if (moveVal > bestVal) {
-          bestMove = i;
-          bestVal = moveVal;
-        }
+  let bestVal = -Infinity;
+  let bestMove = -1;
+
+  for (let i = 0; i < 9; i++) {
+    if (board[i] === "") {
+      board[i] = "O";
+      let moveVal = minimax(board, 0, false);
+      board[i] = "";
+      if (moveVal > bestVal) {
+        bestMove = i;
+        bestVal = moveVal;
       }
     }
-    return bestMove;
-  } else {
-    const emptyCells = [];
-    for (let i = 0; i < 9; i++) {
-      if (board[i] === "") emptyCells.push(i);
-    }
-    if (emptyCells.length === 0) return -1;
-    return emptyCells[Math.floor(Math.random() * emptyCells.length)];
   }
+  return bestMove;
 }
 
 function checkGameOver(board) {
@@ -175,7 +165,9 @@ function handleGameEnd(winner) {
   if (winner === "X") showMessage(friendMode ? "Player X wins!" : "You win!");
   else if (winner === "O") showMessage(friendMode ? "Player O wins!" : "You lose!");
   else showMessage("Draw!");
+
   turnDisplay.style.display = "none";
+
   setTimeout(() => {
     resetBoard();
     grid.style.display = "none";
@@ -185,43 +177,51 @@ function handleGameEnd(winner) {
 }
 
 cells.forEach(cell => {
-  cell.addEventListener('click', function() {
+  cell.addEventListener('click', function () {
     if (friendMode) {
       if (!cell.textContent && checkGameOver(getBoard()) === null) {
         cell.textContent = currentPlayer;
         cell.classList.add('clicked');
         setTimeout(() => cell.classList.remove('clicked'), 300);
+
         let board = getBoard();
         let winner = checkGameOver(board);
         if (winner) {
           handleGameEnd(winner);
           return;
         }
+
         currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
         updateTurnDisplay();
       }
     } else {
-      if (aiTurn) return; // Prevent player from clicking during AI's turn
+      if (aiTurn) return;
+
       if (!cell.textContent && checkGameOver(getBoard()) === null) {
         cell.textContent = 'X';
         cell.classList.add('clicked');
         setTimeout(() => cell.classList.remove('clicked'), 300);
+
         let board = getBoard();
         let winner = checkGameOver(board);
         if (winner) {
           handleGameEnd(winner);
           return;
         }
+
         aiTurn = true;
         let bestMove = findBestMove(board);
+
         if (bestMove !== -1) {
           setTimeout(() => {
             cells[bestMove].textContent = 'O';
             cells[bestMove].classList.add('clicked');
             setTimeout(() => cells[bestMove].classList.remove('clicked'), 300);
+
             let boardAfterO = getBoard();
             let winnerAfterO = checkGameOver(boardAfterO);
             aiTurn = false;
+
             if (winnerAfterO) {
               handleGameEnd(winnerAfterO);
             }
