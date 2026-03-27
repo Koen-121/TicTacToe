@@ -7,7 +7,9 @@ const turnDisplay = document.getElementById('turn-display');
 
 let friendMode = false;
 let currentPlayer = 'X';
-let aiTurn = false; // IMPORTANT FIX
+let aiTurn = false;
+
+// ---------------- TURN DISPLAY ----------------
 
 function updateTurnDisplay() {
   if (!grid.style.display || grid.style.display === "none") {
@@ -23,19 +25,28 @@ function updateTurnDisplay() {
   }
 }
 
+// ---------------- START VS AI ----------------
+
 playBtn.addEventListener('click', function () {
   playBtn.style.display = 'none';
   friendBtn.style.display = 'none';
   grid.style.display = 'grid';
   friendMode = false;
 
+  // 50/50 who starts
   if (Math.random() < 0.5) {
+    // Player starts
     aiTurn = false;
-    currentPlayer = 'X';
-  } else {
+    currentPlayer = 'X'; // Player is X
+    aiSymbol = 'O';
+    playerSymbol = 'X';
+} else {
+    // AI starts
     aiTurn = true;
-    currentPlayer = 'X';
-  }
+    currentPlayer = 'X'; // AI is X
+    aiSymbol = 'X';
+    playerSymbol = 'O';
+}
 
   resetBoard();
   updateTurnDisplay();
@@ -57,6 +68,8 @@ playBtn.addEventListener('click', function () {
   }
 });
 
+// ---------------- FRIEND MODE ----------------
+
 friendBtn.addEventListener('click', function () {
   playBtn.style.display = 'none';
   friendBtn.style.display = 'none';
@@ -67,6 +80,8 @@ friendBtn.addEventListener('click', function () {
   updateTurnDisplay();
 });
 
+// ---------------- BOARD HELPERS ----------------
+
 function getBoard() {
   return cells.map(cell => cell.textContent);
 }
@@ -75,21 +90,26 @@ function isMovesLeft(board) {
   return board.some(cell => cell === "");
 }
 
+// ---------------- EVALUATION (AI = X, PLAYER = O) ----------------
+
 function evaluate(board) {
   const wins = [
     [0,1,2],[3,4,5],[6,7,8],
     [0,3,6],[1,4,7],[2,5,8],
     [0,4,8],[2,4,6]
   ];
+
   for (let line of wins) {
     const [a, b, c] = line;
     if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-      if (board[a] === "O") return +10;
-      if (board[a] === "X") return -10;
+      if (board[a] === "X") return +10; // AI wins
+      if (board[a] === "O") return -10; // Player wins
     }
   }
   return 0;
 }
+
+// ---------------- MINIMAX (AI = X) ----------------
 
 function minimax(board, depth, isMax) {
   const score = evaluate(board);
@@ -101,7 +121,7 @@ function minimax(board, depth, isMax) {
     let best = -Infinity;
     for (let i = 0; i < 9; i++) {
       if (board[i] === "") {
-        board[i] = "O";
+        board[i] = "X"; // AI move
         best = Math.max(best, minimax(board, depth + 1, false));
         board[i] = "";
       }
@@ -111,7 +131,7 @@ function minimax(board, depth, isMax) {
     let best = Infinity;
     for (let i = 0; i < 9; i++) {
       if (board[i] === "") {
-        board[i] = "X";
+        board[i] = "O"; // Player move
         best = Math.min(best, minimax(board, depth + 1, true));
         board[i] = "";
       }
@@ -120,13 +140,15 @@ function minimax(board, depth, isMax) {
   }
 }
 
+// ---------------- BEST MOVE (AI = X) ----------------
+
 function findBestMove(board) {
   let bestVal = -Infinity;
   let bestMove = -1;
 
   for (let i = 0; i < 9; i++) {
     if (board[i] === "") {
-      board[i] = "O";
+      board[i] = "X";
       let moveVal = minimax(board, 0, false);
       board[i] = "";
       if (moveVal > bestVal) {
@@ -138,13 +160,17 @@ function findBestMove(board) {
   return bestMove;
 }
 
+// ---------------- GAME OVER CHECK ----------------
+
 function checkGameOver(board) {
   const score = evaluate(board);
-  if (score === 10) return "O";
-  if (score === -10) return "X";
+  if (score === 10) return "X";
+  if (score === -10) return "O";
   if (!isMovesLeft(board)) return "draw";
   return null;
 }
+
+// ---------------- UI HELPERS ----------------
 
 function showMessage(text) {
   message.textContent = text;
@@ -162,8 +188,8 @@ function resetBoard() {
 }
 
 function handleGameEnd(winner) {
-  if (winner === "X") showMessage(friendMode ? "Player X wins!" : "You win!");
-  else if (winner === "O") showMessage(friendMode ? "Player O wins!" : "You lose!");
+  if (winner === "X") showMessage(friendMode ? "Player X wins!" : "AI wins!");
+  else if (winner === "O") showMessage(friendMode ? "Player O wins!" : "You win!");
   else showMessage("Draw!");
 
   turnDisplay.style.display = "none";
@@ -176,8 +202,12 @@ function handleGameEnd(winner) {
   }, 3000);
 }
 
+// ---------------- CELL CLICK LOGIC ----------------
+
 cells.forEach(cell => {
   cell.addEventListener('click', function () {
+
+    // FRIEND MODE
     if (friendMode) {
       if (!cell.textContent && checkGameOver(getBoard()) === null) {
         cell.textContent = currentPlayer;
@@ -194,41 +224,43 @@ cells.forEach(cell => {
         currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
         updateTurnDisplay();
       }
-    } else {
-      if (aiTurn) return;
+      return;
+    }
 
-      if (!cell.textContent && checkGameOver(getBoard()) === null) {
-        cell.textContent = 'X';
-        cell.classList.add('clicked');
-        setTimeout(() => cell.classList.remove('clicked'), 300);
+    // AI MODE
+    if (aiTurn) return;
 
-        let board = getBoard();
-        let winner = checkGameOver(board);
-        if (winner) {
-          handleGameEnd(winner);
-          return;
-        }
+    if (!cell.textContent && checkGameOver(getBoard()) === null) {
+      cell.textContent = 'O'; // Player is O
+      cell.classList.add('clicked');
+      setTimeout(() => cell.classList.remove('clicked'), 300);
 
-        aiTurn = true;
-        let bestMove = findBestMove(board);
+      let board = getBoard();
+      let winner = checkGameOver(board);
+      if (winner) {
+        handleGameEnd(winner);
+        return;
+      }
 
-        if (bestMove !== -1) {
-          setTimeout(() => {
-            cells[bestMove].textContent = 'O';
-            cells[bestMove].classList.add('clicked');
-            setTimeout(() => cells[bestMove].classList.remove('clicked'), 300);
+      aiTurn = true;
+      let bestMove = findBestMove(board);
 
-            let boardAfterO = getBoard();
-            let winnerAfterO = checkGameOver(boardAfterO);
-            aiTurn = false;
+      if (bestMove !== -1) {
+        setTimeout(() => {
+          cells[bestMove].textContent = 'X'; // AI is X
+          cells[bestMove].classList.add('clicked');
+          setTimeout(() => cells[bestMove].classList.remove('clicked'), 300);
 
-            if (winnerAfterO) {
-              handleGameEnd(winnerAfterO);
-            }
-          }, 300);
-        } else {
+          let boardAfterO = getBoard();
+          let winnerAfterO = checkGameOver(boardAfterO);
           aiTurn = false;
-        }
+
+          if (winnerAfterO) {
+            handleGameEnd(winnerAfterO);
+          }
+        }, 300);
+      } else {
+        aiTurn = false;
       }
     }
   });
