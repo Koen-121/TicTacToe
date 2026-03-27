@@ -19,7 +19,7 @@ function updateTurnDisplay() {
   } else {
     turnDisplay.textContent = `Turn: ${currentPlayer}`;
     turnDisplay.style.display = "block";
-  if (playBtn.style.display = "none") {
+  if (playBtn.style.display === "none") {
     turnDisplay.style.display = "none";
   }
   }
@@ -42,6 +42,21 @@ playBtn.addEventListener('click', function() {
   resetBoard();
   showGame();
   updateTurnDisplay();
+
+if (aiTurn && !friendMode) {
+    setTimeout(() => {
+        let board = getBoard();
+        let bestMove = findBestMove(board);
+        if (bestMove !== -1) {
+            cells[bestMove].textContent = 'O';
+            cells[bestMove].classList.add('clicked');
+            setTimeout(() => cells[bestMove].classList.remove('clicked'), 300);
+        }
+        aiTurn = false;
+        updateTurnDisplay();
+    }, 300);
+}
+  
 });
 
 friendBtn.addEventListener('click', function() {
